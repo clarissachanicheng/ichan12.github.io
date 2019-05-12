@@ -5,19 +5,21 @@ I Cheng Chan
 Xinyao Zhang
 
 Data Science
-This course would involve data analysing from cvs or sql file and sometimes data from website.  The data could have over thousands of entities (row)
-and muliples of artibuties (column).  The users should play close attention on useful analysis such as standard distribution, 
-mean, center and other type of analysis which would introduce latter in this document.
 
-Before analysing data, manipulating data is often needed, so that unnecessary data could be eliminated from analysing progress.  
-There are multiple of ways to manipulate data before analysis such as handling missing data, tidying data, etc. 
+This course would involve data analyzing from cvs or sql file and sometimes data from a website.  The data could have over thousands of entities (row)
+and multiples of attributes (column).  The users should pay close attention on useful analysis such as standard distribution,
+mean, center and other types of analysis which would introduce later in this document.
 
-Visaulizing data is also an important feature of data analysing.  Different kinds of graph could provide differnet information to the read, 
-as well as avoiding unimportant information regarding to what read is looking for.  
+Before analyzing data, manipulating data is often needed so that unnecessary data could be eliminated from analyzing progress. 
+There are multiple ways to manipulate data before analysis such as handling missing data, tidying data, etc.
+
+Visualizing data is also an important feature of data analyzing.  Different kinds of graph could provide different information to the read,
+as well as avoiding unimportant information regarding what read is looking for. 
+
 
 DATA RESOURCES:
 
-PURPOSSE
+PURPOSE
 
 SQL?
 
