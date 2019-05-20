@@ -10,7 +10,47 @@ I Cheng Chan
 Xinyao Zhang
 ***
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+read_csv command is part of the readr R package and allows you to read a dataset stored in a csv file. 
+```{r setup, include=TRUE}
+library(tidyverse)
+
+tab <- read_csv("student_mat.csv")
 ```
 
+Categorical attributes
+```{r}
+table(tab$sex)
+```
+
+Numerical attributes (Discrete or continuous?)
+```{r}
+table(tab$G3)
+```
+
+Exploratory data analysis:
+
+central trends (mean)
+spread (variance)
+skew
+outliers
+
+```{r}
+tab %>%
+  #sample_frac(.1) %>%
+  arrange(G3) %>%
+  rowid_to_column() %>%
+  ggplot(aes(x=rowid, y=G3)) +
+    geom_point() 
+```
+
+```{r}
+tab %>%
+  ggplot(aes(x = G3)) +
+  geom_histogram()
+```
+
+```{r}
+tab %>%
+  ggplot(aes(x = G3)) +
+  geom_density()
+```
