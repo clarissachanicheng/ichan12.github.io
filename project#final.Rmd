@@ -24,7 +24,14 @@ table(tab$sex)
 
 Numerical attributes (Discrete or continuous?)
 ```{r}
+table(tab$G1)
+table(tab$G2)
 table(tab$G3)
+```
+
+```{r}
+tab <- tab %>%
+  mutate(G = (G1 + G2 + G3)/3)
 ```
 
 Exploratory data analysis:
@@ -37,20 +44,81 @@ outliers
 ```{r}
 tab %>%
   #sample_frac(.1) %>%
-  arrange(G3) %>%
+  arrange(G) %>%
   rowid_to_column() %>%
-  ggplot(aes(x=rowid, y=G3)) +
+  ggplot(aes(x=rowid, y=G)) +
     geom_point() 
 ```
 
 ```{r}
 tab %>%
-  ggplot(aes(x = G3)) +
+  ggplot(aes(x = G)) +
   geom_histogram()
 ```
 
 ```{r}
 tab %>%
-  ggplot(aes(x = G3)) +
+  ggplot(aes(x = G)) +
   geom_density()
 ```
+
+```{r}
+tab %>%
+  ggplot(aes(x =' ', y = G)) +
+  geom_boxplot()
+```
+
+```{r}
+tab %>%
+  summarize(min_score = min(G), max_score = max(G))
+
+tab %>%
+  summarize(mean_score = mean(G), median_score = median(G))
+```
+```{r}
+tab %>%
+  ggplot(aes(x = G)) +
+  geom_histogram(bins = 20) + 
+  geom_vline(aes(xintercept = median(G)), color = "red")
+```
+
+Centering and scaling
+```{r}
+sd_tab <- tab %>%
+  mutate(scaled_score = (G - mean(G)) / sd(G)) 
+
+sd_tab %>%
+  ggplot(aes(x = scaled_score)) +
+  geom_histogram(binwidth = .5)
+```
+
+```{r}
+table(sd_tab$guardian)
+
+sd_tab <- sd_tab %>%
+  mutate(guardian_m = ifelse(guardian == "mother", 1, 0),
+         guardian_f = ifelse(guardian == "father", 1, 0)) 
+
+sd_tab %>%
+select(starts_with("guardian")) %>%
+  head()
+```
+
+```{r}
+sd_tab %>%
+  ggplot(aes(x = Walc, y = G)) + 
+  geom_point() +
+  geom_smooth(method = lm)
+
+lm(G~Walc, data = sd_tab) 
+```
+```{r}
+lm(G~Walc + guardian_m + guardian_f, data = sd_tab)
+
+sd_tab %>%
+  ggplot(aes(x = Walc, y = scaled_score, color = guardian)) + 
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+
