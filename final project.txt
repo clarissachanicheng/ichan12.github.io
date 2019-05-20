@@ -20,18 +20,7 @@ as well as avoiding unimportant information regarding what reader is looking for
 DATA RESOURCES:
 https://www.kaggle.com/uciml/student-alcohol-consumption#student-mat.csv
 
-***这些我觉得不太好***
-https://www.kaggle.com/martj42/international-football-results-from-1872-to-2017
-https://www.kaggle.com/spscientist/students-performance-in-exams
-https://www.kaggle.com/neuromusic/avocado-prices
-
-PURPOSE
-
-SQL?
-
-select
-join
-.....
+This is a data set that is related to a sruvey conducted between 2 school's mathematics course students.  The entity of the data would contain some personal backgrouond information.  Our aim is to answer the question regarding whether a student's backgrouon and personal background would affect their performance in their studies.  
 
 R
 
