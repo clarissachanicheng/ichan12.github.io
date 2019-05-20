@@ -1,0 +1,80 @@
+---
+title: "Project4"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=TRUE}
+library(tidyverse)
+library(stringr)
+
+arrest_tab <- read_csv("http://www.hcbravo.org/IntroDataSci/misc/BPD_Arrests.csv")
+dat <- arrest_tab %>% 
+  filter(!is.na(`Location 1`)) %>%
+  separate(`Location 1`, c("lat","lng"), sep=",") %>%
+  mutate(lat=as.numeric(str_replace(lat, "\\(", ""))) %>%
+  mutate(lng=as.numeric(str_replace(lng, "\\)", ""))) %>%
+  sample_n(2000)
+dat
+```
+
+
+```{r part 2}
+library(leaflet)
+
+balto_map <- leaflet(dat) %>%
+  addTiles() %>%
+  setView(lat=39.29, lng=-76.61, zoom=11)
+balto_map
+```
+```{r}
+dat %>%
+  group_by(race) %>%
+  tally()
+
+dat %>%
+  ggplot(mapping = aes(x = age)) +
+  geom_histogram()
+
+df <- dat %>%
+  filter(age < 18)
+
+df2 <- filter(dat, (race == "U" | race == "A" | race == "I"))
+```
+
+
+```{r part 3}
+fancyButton <- makeIcon(
+  iconUrl = ifelse(dat$race == "B", # race B
+                   ifelse(dat$sex == "M", 
+                          "http://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/198/man_emoji-modifier-fitzpatrick-type-5_1f468-1f3fe_1f3fe.png",
+                          "http://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/198/woman_emoji-modifier-fitzpatrick-type-5_1f469-1f3fe_1f3fe.png"),
+                   ifelse(dat$race == "W", #race W
+                          ifelse(dat$sex == "M",
+                                  "http://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/198/man_emoji-modifier-fitzpatrick-type-1-2_1f468-1f3fb_1f3fb.png",
+                                 "http://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/198/woman_emoji-modifier-fitzpatrick-type-1-2_1f469-1f3fb_1f3fb.png"),
+                          ifelse(dat$sex == "M", # Other races
+                                 "http://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/198/man_1f468.png",
+                                 "http://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/198/woman_1f469.png")
+                                 )
+  ),
+  iconWidth = 30, iconHeight = 30,
+  iconAnchorX = 22, iconAnchorY = 22
+)
+
+
+balto_map %>%
+  addMarkers(lng = ~lng, lat = ~lat, label = ~as.character(age), icon = fancyButton, data = dat)
+
+```
+
+```{r}
+balto_map %>%
+  addPopups(~lng, ~lat, "Under 18",
+            options = popupOptions(closeButton = FALSE), data = df)  %>%
+  addPopups(~lng, ~lat, "Other races",
+            options = popupOptions(closeButton = FALSE), data = df2) %>%
+   addMarkers(~lng, ~lat, clusterOptions = markerClusterOptions(), data = dat)
+```
+

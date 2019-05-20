@@ -1,0 +1,297 @@
+---
+title: "project#bonus"
+output: html_document
+---
+
+
+Problem: Does standardizing affordability for each region affect prediction performance? Compare standardized to non-standardized affordability.
+```{r setup}
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(randomForest)
+theme_set(theme_bw())
+csv_file <- "Affordability_Wide_2017Q4_Public.csv"
+tidy_afford <- read_csv(csv_file) %>%
+  filter(Index == "Mortgage Affordability") %>%
+  drop_na() %>%
+  filter(RegionID != 0, RegionName != "United States") %>%
+  dplyr::select(RegionID, RegionName, matches("^[1|2]")) %>%
+  gather(time, affordability, matches("^[1|2]")) %>%
+  type_convert(col_types=cols(time=col_date(format="%Y-%m")))
+tidy_afford
+```
+
+Set up the table that we need
+```{r}
+outcome_df <- tidy_afford %>%
+  mutate(yq = quarter(time, with_year=TRUE)) %>%
+  filter(yq %in% c("2016.4", "2017.4")) %>%
+  select(RegionID, RegionName, yq, affordability) %>%
+  spread(yq, affordability) %>%
+  mutate(diff = `2017.4` - `2016.4`) %>%
+  mutate(Direction = ifelse(diff>0, "up", "down")) %>%
+  select(RegionID, RegionName, Direction)
+outcome_df
+
+predictor_df <- tidy_afford %>%
+  filter(year(time) <= 2016)
+predictor_df
+```
+
+Standardization
+```{r}
+standardized_df <- predictor_df %>%
+  filter(year(time) %in% 2014:2016) %>%
+  group_by(RegionID) %>%
+  mutate(mean_aff = mean(affordability)) %>%
+  mutate(sd_aff = sd(affordability)) %>%
+  mutate(z_aff = (affordability - mean_aff) / sd_aff) %>%
+  ungroup()
+```
+
+```{r}
+wide_df <- standardized_df %>%
+  select(RegionID, time, z_aff) %>%
+  tidyr::spread(time, z_aff)
+wide_df
+```
+
+Create the wide table for the original table
+```{r}
+wide_df_original <- predictor_df %>%
+  select(RegionID, time, affordability) %>%
+  tidyr::spread(time, affordability)
+```
+
+Set up matrices:
+```{r}
+matrix_1 <- wide_df %>%
+  select(-RegionID) %>%
+  as.matrix() %>%
+  .[,-1]
+
+matrix_2 <- wide_df %>%
+  select(-RegionID) %>%
+  as.matrix() %>%
+  .[,-ncol(.)]
+
+diff_df <- (matrix_1 - matrix_2) %>%
+  magrittr::set_colnames(NULL) %>%
+  as_data_frame() %>%
+  mutate(RegionID = wide_df$RegionID)
+```
+
+```{r}
+matrix_1_original <- wide_df_original %>%
+  select(-RegionID) %>%
+  as.matrix() %>%
+  .[,-1]
+
+matrix_2_original <- wide_df_original %>%
+  select(-RegionID) %>%
+  as.matrix() %>%
+  .[,-ncol(.)]
+
+diff_df_original <- (matrix_1_original - matrix_2_original) %>%
+  magrittr::set_colnames(NULL) %>%
+  as_data_frame() %>%
+  mutate(RegionID = wide_df$RegionID)
+```
+
+Add the outcome
+```{r}
+final_df <- diff_df %>%
+  inner_join(outcome_df %>% select(RegionID, Direction), by="RegionID") %>%
+  mutate(Direction=factor(Direction, levels=c("down", "up")))
+final_df
+```
+
+```{r}
+final_df_original <- diff_df_original %>%
+  inner_join(outcome_df %>% select(RegionID, Direction), by="RegionID") %>%
+  mutate(Direction=factor(Direction, levels=c("down", "up")))
+final_df_original
+```
+
+```{r}
+set.seed(1234)
+test_random_forest_df <- final_df %>%
+  group_by(Direction) %>%
+  sample_frac(.5) %>%
+  ungroup()
+
+train_random_forest_df <- final_df %>%
+  anti_join(test_random_forest_df, by="RegionID")
+```
+
+```{r}
+set.seed(1234)
+test_random_forest_df_original <- final_df_original %>%
+  group_by(Direction) %>%
+  sample_frac(.5) %>%
+  ungroup()
+
+train_random_forest_df_original <- final_df_original %>%
+  anti_join(test_random_forest_df_original, by="RegionID")
+```
+
+```{r}
+library(caret)
+train_random_forest_df %>%
+                  dplyr::select(-RegionID)
+```
+
+```{r}
+library(caret)
+rf_fit <- train(Direction~.,
+                data = train_random_forest_df %>%
+                  dplyr::select(-RegionID),
+                method="rf",
+                trControl=trainControl(method="none"))
+rf_fit
+```
+
+```{r}
+library(caret)
+rf_fit_original <- train(Direction~.,
+                data = train_random_forest_df_original %>%
+                  dplyr::select(-RegionID),
+                method="rf",
+                trControl=trainControl(method="none"))
+rf_fit_original
+```
+
+```{r}
+test_predictions <- predict(rf_fit,                      
+                            newdata = test_random_forest_df %>%
+                              select(-RegionID))
+
+table(pred=test_predictions,
+      observed=test_random_forest_df$Direction)
+```
+
+
+```{r}
+test_predictions_original <- predict(rf_fit_original,                      
+                            newdata = test_random_forest_df_original %>%
+                              select(-RegionID))
+
+table(pred=test_predictions_original,
+      observed=test_random_forest_df_original$Direction)
+```
+
+```{r}
+set.seed(1234)
+
+# create the cross-validation partition
+cv_partition <- createFolds(final_df$Direction,
+                            k=5)
+
+fit_control <- trainControl( ## 5-fold CV
+  method = "cv",
+  number = 5,
+  indexOut = cv_partition,
+  summaryFunction=twoClassSummary,
+  classProbs=TRUE,
+  savePredictions=TRUE)
+
+big_rf_fit <- train(Direction~.,
+                    data=final_df,
+                    method = "rf",
+                    ntree = 500,
+                    trControl = fit_control,
+                    metric="ROC")
+                    
+
+small_rf_fit <- train(Direction~.,
+                      data = final_df,
+                      method = "rf",
+                      ntree = 10,
+                      trControl = fit_control,
+                      metric="ROC")
+
+
+show(big_rf_fit)
+small_rf_fit
+```
+
+```{r}
+set.seed(1234)
+
+# create the cross-validation partition
+cv_partition_original <- createFolds(final_df_original$Direction,
+                            k=5)
+
+fit_control_original <- trainControl( ## 5-fold CV
+  method = "cv",
+  number = 5,
+  indexOut = cv_partition_original,
+  summaryFunction=twoClassSummary,
+  classProbs=TRUE,
+  savePredictions=TRUE)
+
+big_rf_fit_original <- train(Direction~.,
+                    data=final_df_original,
+                    method = "rf",
+                    ntree = 500,
+                    trControl = fit_control,
+                    metric="ROC")
+                    
+
+small_rf_fit_original <- train(Direction~.,
+                      data = final_df_original,
+                      method = "rf",
+                      ntree = 10,
+                      trControl = fit_control,
+                      metric="ROC")
+
+
+show(big_rf_fit_original)
+small_rf_fit_original
+```
+
+```{r}
+library(plotROC)
+
+roc_df <-
+  big_rf_fit$pred %>%
+    filter(mtry == 2) %>%
+    mutate(model = "standardized") %>%
+    bind_rows(big_rf_fit_original$pred %>% 
+                filter(mtry == 2) %>%
+                mutate(model = "original"))
+
+roc_df %>%
+  ggplot(aes(m=up,
+             d=factor(obs, levels=c("down","up")),
+             color=model)) +
+    geom_roc(n.cuts=0) +
+    coord_equal() +
+    style_roc() 
+
+
+
+```
+
+```{r}
+roc_df <-
+  small_rf_fit$pred %>%
+    filter(mtry == 2) %>%
+    mutate(model = "standardized") %>%
+    bind_rows(small_rf_fit_original$pred %>% 
+                filter(mtry == 2) %>%
+                mutate(model = "original"))
+
+roc_df %>%
+  ggplot(aes(m=up,
+             d=factor(obs, levels=c("down","up")),
+             color=model)) +
+    geom_roc(n.cuts=0) +
+    coord_equal() +
+    style_roc() 
+
+
+```
+
+In all, the standardization makes prediction performance better. I guess the reason is that standardization helps to decrease the complexity of the decision tree model.
