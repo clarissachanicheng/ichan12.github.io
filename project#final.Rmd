@@ -92,6 +92,9 @@ sd_tab %>%
   geom_histogram(binwidth = .5)
 ```
 
+Convert categorical attributes to numerical
+??????????????????,??????,????????????
+
 ```{r}
 table(sd_tab$guardian)
 
@@ -104,6 +107,7 @@ select(starts_with("guardian")) %>%
   head()
 ```
 
+Linear regression with only one X (Walc)
 ```{r}
 sd_tab %>%
   ggplot(aes(x = Walc, y = G)) + 
@@ -112,6 +116,8 @@ sd_tab %>%
 
 lm(G~Walc, data = sd_tab) 
 ```
+
+Linear regression with 3 variables
 ```{r}
 lm(G~Walc + guardian_m + guardian_f, data = sd_tab)
 
