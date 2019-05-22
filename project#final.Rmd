@@ -213,9 +213,10 @@ sd_tab %>%
   geom_smooth(method = lm)
 ```
 Conclusion
-Generally, we expect that alcohol consumption would affect student's grade, however, through this experiment, we have an opposite conclusion, but this should not be the final conclusion regarding to student's grade.  There are lots of different aspects that could affect a student's grade, for example, the understand of material, and effectiveness of learning.  Different guardian might have different ways to raise their children, but not all of them will be using the same way.  On the other hand, we are just using sample will less than 400 coming from 2 schools.  The sample size is not large enough to conclude anything.  
+Generally, we expect that alcohol consumption would affect student's grade, however, through this experiment, we accept the null hypothesis. Thus, we obtain an opposite conclusion - The alcohol consumption won't affect student's grade. 
+This should not be the final conclusion regarding to student's grade.  There are lots of different aspects that could affect a student's grade, for example, the understand of material, and effectiveness of learning.  Different guardian might have different ways to raise their children, but not all of them will be using the same way.  On the other hand, we are just using sample will less than 400 coming from 2 schools.  The sample size is not large enough to conclude anything.  
 
-Through the use of data analysis, people can do lots of analysis related to different areas and situation, some of them might not have the result of what people usually expect, like this case.  Therefore, data science is not only a useful technic, but also a tools for people to understand and prove things around them.   
+Through the use of data analysis, people can do lots of analysis related to different areas and situation, some of them might not have the result of what people usually expect, like this case.  Therefore, data science is not only a useful technique, but also a tool for people to understand the essense of the topic, thus making wise decsions.
 
 Here is a website provided by R where user could search for other functionality for their analysis.  
 https://www.rdocumentation.org/
