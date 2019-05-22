@@ -33,9 +33,9 @@ read_csv(file)
 -	read_csv command is part of the readr R package and allows you to read a dataset stored in a csv file.  In this function, there parameter aside for file is not required, unless user wants to change anyone of them, there is no need to type that out.  
 
 <-
--	this symbol means assign the result from the right variable to the left variable 
+-	this symbol means assigning the result from the right variable to the left variable 
 
-typing the variable name alone means show the content contained by this variable
+typing the variable name alone can show the content contained by this variable
  
 ```{r setup, include=TRUE}
 library(tidyverse)
@@ -78,10 +78,10 @@ tab <- tab %>%
 tab
 ```
 
-By now, we are ready to analysis the data.  First let see the see the grade represented in graph.  
+By now, we are ready to analyze the data.  First let's take a look at the grade represented in graph.  
 
 We used arrange (G) to arrange the order of the dataset in ascending order by default according to the column G.  Next, we assign the row number for each entity (rowed_to_column()).  
-Ggplote() is a function we used to draw graph, inside the function we assigne the row number to x-axis, the average grade column G to the y-axis.  The + sign is use to say that what type of graph we would like to draw, there are many other kinds of graph like geom_boxplot() for boxplot graph which would be used latter, grom_point() is drawing the graph by point for each value.    
+ggplot() is a function we used to draw graph, inside the function we assigne the row number to x-axis, the average grade column G to the y-axis.  The + sign is use to say that what type of graph we would like to draw, there are many other kinds of graph like geom_boxplot() for boxplot graph which would be used latter, grom_point() is drawing the graph by point for each value.    
 
 ```{r}
 tab %>%
@@ -160,7 +160,14 @@ sd_tab %>%
 sd_tab
 ```
 
-Here, we are adding 2 column to represent the gradian, because we also want to see how different the result is for different guardian, one for mother, one for father, although there is one more option "other", we consider it as default value.  
+Here, we are converting categorical attribute to numerical ones. Since the attributes have 3 options: father, mother, and other, we can represent the guardian by adding 2 columns.
+
+Guardian  father mother
+father    1       0
+mother    0       1
+other     0       0
+
+We also want to see how different the result is for different guardian. We created dummy numerical attributes (one for mother, one for father). In this way, the option "other" will be considered as default value since both of its "father" and "mother" attributes are 0.  
 
 ```{r}
 table(sd_tab$guardian)
@@ -204,7 +211,7 @@ sd_tab %>%
   geom_smooth(method = lm)
 ```
 Conclusion
-Generally, we expect that alcohol consumption would affect student's grade, however, through this experiment, we have an opposite conclusion, but this should not be the final conclusion regarding to student's grade.  There are lots of different aspect that could affect a student's grade, for example, the understand of material, and effectiveness of learning.  Different guardian might have different ways to raise their children, but not all of them will be using the same way.  On the other hand, we are just using sample will less than 400 coming from 2 schools.  The sample size is not large enough to conclude anything.  
+Generally, we expect that alcohol consumption would affect student's grade, however, through this experiment, we have an opposite conclusion, but this should not be the final conclusion regarding to student's grade.  There are lots of different aspects that could affect a student's grade, for example, the understand of material, and effectiveness of learning.  Different guardian might have different ways to raise their children, but not all of them will be using the same way.  On the other hand, we are just using sample will less than 400 coming from 2 schools.  The sample size is not large enough to conclude anything.  
 
 Through the use of data analysis, people can do lots of analysis related to different areas and situation, some of them might not have the result of what people usually expect, like this case.  Therefore, data science is not only a useful technic, but also a tools for people to understand and prove things around them.   
 
