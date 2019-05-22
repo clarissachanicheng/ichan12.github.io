@@ -46,7 +46,7 @@ tab <- read_csv("student_mat.csv")
 tab
 ```
 
-table(.)
+table(...)
 -	show the corresponding data set in summarized factor form
 
 Here we chose tab$sex, mean information in the column named sex, below showed that there are 2 types of entity in the column, F and M, this is categorical attribute.    
@@ -212,12 +212,27 @@ sd_tab %>%
   geom_point() +
   geom_smooth(method = lm)
 ```
+
 Conclusion
+
 Generally, we expect that alcohol consumption would affect student's grade, however, through this experiment, we accept the null hypothesis. Thus, we obtain an opposite conclusion - The alcohol consumption won't affect student's grade. 
 This should not be the final conclusion regarding to student's grade.  There are lots of different aspects that could affect a student's grade, for example, the understand of material, and effectiveness of learning.  Different guardian might have different ways to raise their children, but not all of them will be using the same way.  On the other hand, we are just using sample will less than 400 coming from 2 schools.  The sample size is not large enough to conclude anything.  
 
 Through the use of data analysis, people can do lots of analysis related to different areas and situation, some of them might not have the result of what people usually expect, like this case.  Therefore, data science is not only a useful technique, but also a tool for people to understand the essense of the topic, thus making wise decsions.
 
+Resources
+
 Here is a website provided by R where user could search for other functionality for their analysis.  
 https://www.rdocumentation.org/
 
+Linear regression for machine learning, linear regression is not only a useful topic in data science, but also in machine learning.
+https://medium.com/datadriveninvestor/understanding-linear-regression-in-machine-learning-643f577eba84
+
+Data science has a big market.  There are lots of job opportunities related to data science and the salary is high. 
+https://www.northeastern.edu/graduate/blog/data-science-careers-shaping-our-future/
+
+Data science help solving real world problem in business and many other areas. 
+https://www.viget.com/articles/solving-problems-with-data-science/
+
+Real topic related to data science
+https://www.kdnuggets.com/2019/02/odsc-10-trending-data-science-topics.html
