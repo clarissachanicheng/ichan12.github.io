@@ -12,6 +12,8 @@ Xinyao Zhang (writing and coding)
 
 Data Science
 
+Data science is extremely important nowadays in our life. Artificial intelligence and machine learning depends largely on the big data analysis. Besides computers, human decision makers also make detailed analyses based on data about specific field, in order to make better decisions. 
+
 This course would involve data analyzing from cvs file and sometimes data from a website.  The data could have over thousands of entities (row) and multiples of attributes (column).  The users should pay close attention on useful analysis such as standard distribution, mean, center and other types of analysis which would introduce later in this document.
 Before analyzing data, manipulating data is often needed so that unnecessary data could be eliminated from analyzing progress. 
 There are multiple ways to manipulate data before analysis such as handling missing data, tidying data, etc.
